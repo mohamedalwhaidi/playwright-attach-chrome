@@ -17,6 +17,62 @@ This package launches Chrome with a **persistent user-data-dir** and **`--remote
 
 Works on macOS, Linux, and Windows. Auto-detects Chrome / Chromium / Edge / Brave.
 
+## How it works
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor You
+    participant CLI as pac (CLI)
+    participant Chrome
+    participant Site as Target site
+
+    You->>CLI: pac capture --url X --user-data-dir P --har out.har
+    CLI->>CLI: locate Chrome binary on disk
+    CLI->>CLI: check port 9222 is free
+    CLI->>Chrome: spawn Chrome with<br/>--remote-debugging-port=9222<br/>--user-data-dir=P
+    Chrome-->>CLI: CDP endpoint ready
+    CLI->>Chrome: Playwright connectOverCDP
+    CLI->>Chrome: subscribe request / response events
+    CLI->>Chrome: navigate first tab to X
+
+    rect rgb(230, 245, 255)
+        Note over You,Site: You drive the browser manually
+        You->>Chrome: type, click, scroll
+        Chrome->>Site: XHR / fetch / GraphQL
+        Site-->>Chrome: JSON / HTML responses
+        Chrome-->>CLI: every req+res over CDP
+        CLI->>CLI: filter by URL, buffer, stream NDJSON
+    end
+
+    You->>CLI: Ctrl-C
+    CLI->>CLI: write HAR file
+    CLI-->>You: out.har on disk
+    Note over Chrome: Chrome window stays open<br/>for you to keep using
+```
+
+### First run vs later runs
+
+The CLI's secret weapon is the `--user-data-dir` flag — it points Chrome at a folder where it stores cookies, localStorage, extensions, history. Reuse the same folder across runs and your login persists.
+
+```mermaid
+flowchart LR
+    Start([pac capture<br/>--user-data-dir ~/.my-profile]) --> Q{Profile dir<br/>exists?}
+    Q -->|No, first run| Empty[Empty Chrome profile]
+    Empty --> Login[You log in once<br/>in the Chrome window]
+    Login --> Save[Cookies saved to<br/>~/.my-profile]
+    Save --> Cap[Capture & navigate]
+
+    Q -->|Yes, returning| Hot[Profile already has<br/>your cookies]
+    Hot --> Already[Auto-logged-in<br/>on next launch]
+    Already --> Cap
+
+    Cap --> Done([Ctrl-C → HAR written])
+
+    style Login fill:#fff4cc
+    style Already fill:#ccf2cc
+```
+
 ## Install
 
 ```bash
@@ -144,6 +200,62 @@ Playwright عادةً يفتح متصفح Chromium مؤقت بدون كوكيز 
 الأداة هذي تشغّل Chrome **بملف تعريف ثابت** على المنفذ ‎9222‎ (CDP)، ثم تربط Playwright عليه. تسجّل دخولك مرة وحدة، وChrome يحفظك للأبد (الكوكيز محفوظة في مجلد البروفايل)، وPlaywright يشوف كل طلب يطلع من الصفحة.
 
 تدعم macOS و Linux و Windows. تكتشف Chrome / Chromium / Edge / Brave تلقائيًا.
+
+## كيف تشتغل (شرح بصري)
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor You as أنت
+    participant CLI as pac (الأداة)
+    participant Chrome
+    participant Site as الموقع المستهدف
+
+    You->>CLI: pac capture --url X --user-data-dir P --har out.har
+    CLI->>CLI: تحديد مسار Chrome على الجهاز
+    CLI->>CLI: التأكد إن المنفذ 9222 شاغر
+    CLI->>Chrome: تشغيل Chrome مع<br/>--remote-debugging-port=9222<br/>--user-data-dir=P
+    Chrome-->>CLI: نقطة CDP جاهزة
+    CLI->>Chrome: Playwright connectOverCDP
+    CLI->>Chrome: الاشتراك بأحداث الطلبات والردود
+    CLI->>Chrome: الانتقال للرابط X
+
+    rect rgb(230, 245, 255)
+        Note over You,Site: أنت تتصفح يدويًا
+        You->>Chrome: كتابة، نقر، تمرير
+        Chrome->>Site: XHR / fetch / GraphQL
+        Site-->>Chrome: ردود JSON / HTML
+        Chrome-->>CLI: كل طلب ورد عبر CDP
+        CLI->>CLI: فلترة، تخزين، بث NDJSON
+    end
+
+    You->>CLI: Ctrl-C
+    CLI->>CLI: كتابة ملف HAR
+    CLI-->>You: out.har على القرص
+    Note over Chrome: نافذة Chrome تبقى مفتوحة<br/>لتكمل عليها
+```
+
+### المرة الأولى مقابل المرات اللاحقة
+
+سر الأداة هو `--user-data-dir` — مجلد يحتفظ Chrome فيه بالكوكيز و localStorage و الإضافات. استخدم نفس المجلد في كل مرة، ويبقى حسابك مسجّلًا.
+
+```mermaid
+flowchart LR
+    Start([pac capture<br/>--user-data-dir ~/.my-profile]) --> Q{المجلد<br/>موجود؟}
+    Q -->|لا، أول مرة| Empty[بروفايل Chrome فارغ]
+    Empty --> Login[تسجّل دخولك مرة وحدة<br/>في نافذة Chrome]
+    Login --> Save[تُحفظ الكوكيز في<br/>~/.my-profile]
+    Save --> Cap[التقاط وتصفح]
+
+    Q -->|نعم، مرة لاحقة| Hot[المجلد يحوي<br/>كوكيزك أصلاً]
+    Hot --> Already[تدخل مباشرة<br/>بدون تسجيل دخول]
+    Already --> Cap
+
+    Cap --> Done([Ctrl-C يكتب ملف HAR])
+
+    style Login fill:#fff4cc
+    style Already fill:#ccf2cc
+```
 
 ## التثبيت
 
