@@ -35,11 +35,14 @@ program
     .option('--quiet', 'Suppress the live log')
     .action(async (opts) => {
         const filter = parseFilter(opts.filter);
+        // Launch with about:blank so we can attach BEFORE navigation. Otherwise
+        // the page loads (and finishes) before Playwright is listening, and the
+        // initial request burst is lost.
         const chrome = await launchChrome({
             chromePath: opts.chromePath,
             port: Number(opts.port),
             userDataDir: opts.userDataDir,
-            startUrl: opts.url,
+            startUrl: 'about:blank',
         });
 
         log(`Chrome started.`);
@@ -73,6 +76,15 @@ program
             outputNdjson: opts.ndjson,
             onEvent: opts.quiet ? undefined : printEvent,
         });
+
+        // Now that capture is wired, navigate to the requested URL so the
+        // initial request burst is recorded.
+        if (opts.url) {
+            const firstPage = defaultContext.pages()[0] ?? (await defaultContext.newPage());
+            firstPage.goto(opts.url).catch((err) => {
+                log(`Navigation to ${opts.url} failed: ${err.message}`);
+            });
+        }
 
         const cleanup = async (): Promise<void> => {
             log('\nStopping capture…');

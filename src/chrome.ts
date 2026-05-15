@@ -85,6 +85,13 @@ export async function launchChrome(opts: LaunchChromeOptions = {}): Promise<Laun
     const port = opts.port ?? 9222;
     const userDataDir = opts.userDataDir ?? mkdtempSync(join(tmpdir(), 'pac-chrome-'));
 
+    if (await isPortOccupied(port)) {
+        throw new Error(
+            `Port ${port} is already in use. A previous Chrome (or another process) is still listening there.\n` +
+                `Either kill it (\`pkill -9 -f "remote-debugging-port=${port}"\`) or choose a different --port.`,
+        );
+    }
+
     const args = [
         `--remote-debugging-port=${port}`,
         `--user-data-dir=${userDataDir}`,
@@ -107,6 +114,17 @@ export async function launchChrome(opts: LaunchChromeOptions = {}): Promise<Laun
     await waitForCdp(cdpUrl);
 
     return { process: child, port, userDataDir, cdpUrl };
+}
+
+async function isPortOccupied(port: number): Promise<boolean> {
+    try {
+        const res = await fetch(`http://localhost:${port}/json/version`, {
+            signal: AbortSignal.timeout(500),
+        });
+        return res.ok;
+    } catch {
+        return false;
+    }
 }
 
 async function waitForCdp(cdpUrl: string, timeoutMs = 15000): Promise<void> {
