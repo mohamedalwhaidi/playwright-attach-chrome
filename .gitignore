@@ -1,0 +1,8 @@
+node_modules/
+dist/
+*.har
+*.ndjson
+.DS_Store
+.idea/
+.vscode/
+.tmp-chrome-profile/

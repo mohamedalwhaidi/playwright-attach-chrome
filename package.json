@@ -1,0 +1,46 @@
+{
+  "name": "playwright-attach-chrome",
+  "version": "0.1.0",
+  "description": "Attach Playwright to a real Chrome session — capture & filter network traffic from a logged-in window. Export HAR.",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "bin": {
+    "playwright-attach-chrome": "./dist/cli.js",
+    "pac": "./dist/cli.js"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "prepublishOnly": "npm run build",
+    "start": "node dist/cli.js"
+  },
+  "keywords": [
+    "playwright",
+    "chrome",
+    "cdp",
+    "network-capture",
+    "har",
+    "devtools",
+    "reverse-engineering",
+    "api-inspection"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^12.1.0",
+    "playwright-core": "^1.50.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "typescript": "^5.7.0"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
