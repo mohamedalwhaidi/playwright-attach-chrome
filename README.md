@@ -130,6 +130,44 @@ pac attach --port 9222 --filter api.gathern.co --har out.har
 
 Useful when you want to debug a session that's already in progress without restarting Chrome.
 
+## Quick start — MCP (drive it from an AI assistant)
+
+The package ships an MCP server that lets Claude / Cursor / any MCP-aware tool drive the capture flow.
+
+Register it in your MCP config (e.g. Claude Desktop's `~/Library/Application Support/Claude/claude_desktop_config.json` on macOS, or `~/.claude/mcp.json` for Claude Code):
+
+```jsonc
+{
+  "mcpServers": {
+    "playwright-attach-chrome": {
+      "command": "npx",
+      "args": ["-y", "playwright-attach-chrome", "mcp"]
+    }
+  }
+}
+```
+
+Restart your assistant. Then ask:
+
+> *Capture every api.gathern.co request while I log in and add a chalet, then summarise the endpoints.*
+
+The assistant will:
+
+1. Call **`start_capture`** with the URL + filter → Chrome window opens, you log in
+2. Call **`peek_events`** as you interact → live view of captured calls
+3. Call **`get_event`** for any request whose body it needs to inspect
+4. Call **`stop_capture`** when you say done → returns a summary + writes a HAR
+
+### MCP tool surface
+
+| Tool | What it does |
+| --- | --- |
+| `start_capture` | Launch Chrome, attach Playwright, navigate, begin capture. Returns `sessionId`. |
+| `peek_events` | Newest-first event summaries (filter / limit / direction). |
+| `get_event` | Full headers + body for one event by index. Body cap configurable. |
+| `navigate` | Programmatically drive the open tab to a new URL. |
+| `stop_capture` | Stop, optionally write HAR, return summary (counts, top paths, status codes). |
+
 ## Quick start — library
 
 ```ts
@@ -280,6 +318,44 @@ pac capture \
 اضغط Ctrl-C — يُكتب ملف `gathern.har`. افتحه في Chrome DevTools (سحب وإفلات على لسان Network) أو في Postman / Insomnia.
 
 استخدم نفس `--user-data-dir` في المرة الجاية تتفادى تسجيل الدخول.
+
+## تشغيل سريع — MCP (من مساعد ذكي)
+
+الحزمة تجي معاها MCP server يخلي Claude أو Cursor أو أي عميل MCP يقود عملية الالتقاط.
+
+أضف الخادم في إعدادات MCP عندك (مثلًا `~/Library/Application Support/Claude/claude_desktop_config.json` على macOS، أو `~/.claude/mcp.json` لـ Claude Code):
+
+```jsonc
+{
+  "mcpServers": {
+    "playwright-attach-chrome": {
+      "command": "npx",
+      "args": ["-y", "playwright-attach-chrome", "mcp"]
+    }
+  }
+}
+```
+
+أعد تشغيل المساعد، ثم اطلب منه:
+
+> *التقط لي كل طلبات api.gathern.co وأنا أسجّل دخولي وأضيف شاليه، وبعدين لخّص لي نقاط الـ API.*
+
+المساعد بيستخدم:
+
+1. **`start_capture`** بالرابط + الفلتر → تنفتح نافذة Chrome، أنت تسجّل دخولك
+2. **`peek_events`** أثناء استخدامك → عرض حي للطلبات الملتقطة
+3. **`get_event`** لأي طلب يحتاج يقرأ محتواه الكامل
+4. **`stop_capture`** لما تقول خلصت → يعطيك ملخص ويكتب HAR
+
+### الأدوات (Tools) المعروضة
+
+| Tool | الوظيفة |
+| --- | --- |
+| `start_capture` | تشغيل Chrome، ربط Playwright، فتح الرابط، بدء الالتقاط. ترجع `sessionId`. |
+| `peek_events` | ملخص الطلبات من الأحدث (مع فلتر / عدد / اتجاه). |
+| `get_event` | الترويسات والجسم كامل لطلب واحد. |
+| `navigate` | فتح رابط جديد في نفس التبويب برمجيًا. |
+| `stop_capture` | إيقاف، كتابة HAR اختياريًا، إرجاع ملخص (عدد، أكثر المسارات، رموز الحالة). |
 
 ## الحيلة (لو تحب تفهم)
 

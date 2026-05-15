@@ -153,6 +153,16 @@ program
         await new Promise(() => {});
     });
 
+program
+    .command('mcp')
+    .description(
+        'Run as a Model Context Protocol server (stdio). Lets an AI assistant drive the launch + capture + export flow over MCP tool calls.',
+    )
+    .action(async () => {
+        const { startMcpServer } = await import('./mcp.js');
+        await startMcpServer();
+    });
+
 program.parseAsync(process.argv).catch((err) => {
     console.error(err.message);
     process.exit(1);

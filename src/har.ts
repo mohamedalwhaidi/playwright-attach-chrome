@@ -78,7 +78,7 @@ export async function writeHar(events: CapturedEvent[], outputPath: string): Pro
     const har: Har = {
         log: {
             version: '1.2',
-            creator: { name: 'playwright-attach-chrome', version: '0.1.0' },
+            creator: { name: 'playwright-attach-chrome', version: '0.2.0' },
             entries,
         },
     };

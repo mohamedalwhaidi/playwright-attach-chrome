@@ -1,7 +1,7 @@
 {
   "name": "playwright-attach-chrome",
-  "version": "0.1.0",
-  "description": "Attach Playwright to a real Chrome session — capture & filter network traffic from a logged-in window. Export HAR.",
+  "version": "0.2.0",
+  "description": "Attach Playwright to a real Chrome session — capture & filter network traffic from a logged-in window. Export HAR. CLI + MCP server.",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -28,13 +28,17 @@
     "har",
     "devtools",
     "reverse-engineering",
-    "api-inspection"
+    "api-inspection",
+    "mcp",
+    "model-context-protocol"
   ],
   "author": "",
   "license": "MIT",
   "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0",
     "commander": "^12.1.0",
-    "playwright-core": "^1.50.0"
+    "playwright-core": "^1.50.0",
+    "zod": "^3.23.0"
   },
   "devDependencies": {
     "@types/node": "^22.10.0",
