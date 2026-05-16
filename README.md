@@ -17,6 +17,13 @@ This package launches Chrome with a **persistent user-data-dir** and **`--remote
 
 Works on macOS, Linux, and Windows. Auto-detects Chrome / Chromium / Edge / Brave.
 
+## Requirements
+
+- **Chrome** (or Chromium / Edge / Brave) installed at a standard path — auto-detected on macOS, Linux, and Windows. Pass `--chrome-path` to override.
+- **Node.js ≥ 18.**
+
+That's it. **You do NOT need to install Playwright separately.** This package depends on [`playwright-core`](https://www.npmjs.com/package/playwright-core) — Playwright's API without bundled browsers — because we attach to your real Chrome instead of launching Playwright's bundled Chromium. No `npx playwright install`, no 300 MB browser download.
+
 ## How it works
 
 ```mermaid
@@ -238,6 +245,13 @@ Playwright عادةً يفتح متصفح Chromium مؤقت بدون كوكيز 
 الأداة هذي تشغّل Chrome **بملف تعريف ثابت** على المنفذ ‎9222‎ (CDP)، ثم تربط Playwright عليه. تسجّل دخولك مرة وحدة، وChrome يحفظك للأبد (الكوكيز محفوظة في مجلد البروفايل)، وPlaywright يشوف كل طلب يطلع من الصفحة.
 
 تدعم macOS و Linux و Windows. تكتشف Chrome / Chromium / Edge / Brave تلقائيًا.
+
+## المتطلبات
+
+- **Chrome** (أو Chromium / Edge / Brave) مثبّت بمكان قياسي — يكتشفه تلقائيًا. تقدر تمرر `--chrome-path` لو حاب تحدد مسار يدويًا.
+- **Node.js ≥ 18.**
+
+هذا كل شي. **مو لازم تثبّت Playwright بشكل منفصل.** الحزمة تعتمد على [`playwright-core`](https://www.npmjs.com/package/playwright-core) — يعني واجهة Playwright البرمجية فقط بدون متصفحات مرفقة — لأننا نربط على Chrome الحقيقي عندك بدل ما نشغّل Chromium الخاص بـ Playwright. ما تحتاج تنفّذ `npx playwright install` ولا تنزّل متصفح بحجم 300 ميقا.
 
 ## كيف تشتغل (شرح بصري)
 
